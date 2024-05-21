@@ -5,7 +5,6 @@ from tqdm import trange, tqdm
 from time import sleep
 
 
-
 class VK:
     # Получени токена
     def __init__(self, access_token, user_id, owner_id, version='5.131'):
@@ -22,7 +21,7 @@ class VK:
         return response.json()
     
     # Получение и закрузка фото с профиля
-    def foto_project(self, owner_id, offset = 0, count = 4):
+    def foto_project(self, owner_id, offset = 0, count = 5):
         self.offset = offset,
         self.count = count,
         self.owner_id = owner_id
@@ -35,15 +34,11 @@ class VK:
                 'extended': 1,
                 'offset': offset}
         response = requests.get(url_vk, params={**self.params, **params_vk, **headers})
-        image_vk = response.json()['response']['items'][3]['sizes'][3]['url'][3]
-        for file in response:
-            image_vk = file['sizes'][-1]['url']
-            file_name = image_vk.split('/')[-1]
-
+        image_vk = response.json()['response']['items'][3]['sizes'][4]['url']
         with open('image.jpg', 'wb') as f:
-            response = requests.get(file_name)
+            response = requests.get(image_vk)
             f.write(response.content)
-        return response
+        return image_vk
 
 
 class Yandex:
@@ -54,31 +49,26 @@ class Yandex:
     def foto_yandex_disk(self):
         url_create_folder = 'https://cloud-api.yandex.net/v1/disk/resources'
         params = {"path": 'Image'}
-        headers = {"Authorization": "OAuth y0_AgAAAAAOk2cQAADLWwAAAAEDecVcAACa71RZu3dKkKhY9AElp54ZOVdl0w"}
+        headers = {"Authorization": ""}
         response = requests.put(url_create_folder, params=params, headers=headers)
-        print(response.json())
+        print (response)
+        return response
     
-    def foto_upload(self, foto_folder):
+    def foto_upload(self, foto_folder,  count = 5):
+        self.count = count,
         self.foto_folder = foto_folder
         self.params = {'foto_folder': self.foto_folder}
         url_load = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
-        params = {"path": f'{"Image"}/{foto_folder}'}
+        params = {"path": f'{'Image'}/{foto_folder}'}
         response = requests.get(url_load, params=params, headers=headers)
         with open('image.jpg', 'rb') as f:
             url_upload = response.json()['href']
             requests.put(url_upload, files={'file': f})
-        
-        for img in tqdm(url_upload):
-            print(img)
+        return response
         
         
         
-        
-        
-    
- 
-
-access_token = 'token'
+access_token = ''
 headers = {'Authorization' :''}
 user_id = 75476193
 owner_id = 75476193 
@@ -89,19 +79,20 @@ headers = {'Authorization': f'OAuth {token}'}
 
 
 
-
 foto_folder = {'Image'}
+foto_folder = ['image.jpg']
 url_upload = {'Image'}
 Image = {'Image'}
 file_name = ('Image')
-path={f'Image/{foto_folder}'}
+path={f'{'Image'}/{foto_folder}'}
 yandex = Yandex(path)
-foto_folder = ['href']
+
+
 
 pprint.pprint(yandex.foto_yandex_disk())
-print(yandex.foto_upload(foto_folder))
+pprint.pprint(yandex.foto_upload(foto_folder))
 pprint.pprint(vk.users_info())
-pprint.pprint(vk.foto_project(owner_id, count = 4))
+pprint.pprint(vk.foto_project(owner_id))
 
   
 
